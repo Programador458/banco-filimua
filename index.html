@@ -1,0 +1,272 @@
+
+<?php
+
+    include 'conf.php';
+
+    if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+        $nome = $_POST['nome'];
+        $email = $_POST['email'];   
+        $telefone = $_POST['telefone'];   
+        $senha = $_POST['senha'];
+        $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
+        
+        $stml = $pdo->prepare("SELECT COUNT(*) FROM clientes WHERE email = :email");
+        $stml->bindParam(':email', $email);
+        $stml->execute();
+        $emailExiste = $stml->fetchColumn();
+
+        if($emailExiste){
+            echo "<p>E-mail Já Existe</p>";
+        }else{
+
+            $stmt= $pdo->prepare("INSERT INTO clientes(nome_cliente, email, telefone, codigo_secreto) VALUES(:nome_cliente, :email, :telefone, :codigo_secreto)");
+            $stmt->bindParam(':nome_cliente', $nome);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':telefone', $telefone);
+            $stmt->bindParam(':codigo_secreto', $senhaHash);
+            $stmt->execute();
+
+            $id_cliente = $pdo->lastInsertId();
+
+            $_SESSION['id_cliente'] = $id_cliente;
+            $_SESSION['nome_cliente'] = $nome;
+
+            header("Location: painel.php");
+
+            
+        }
+    }
+
+?>
+
+<!DOCTYPE html>
+<html lang="pt_BR">
+<head>
+    <link rel="icon" href="../pictures/cartao.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Atlântico</title>
+    <link rel="stylesheet" href="../styles/cabecalho.css">
+    <link rel="stylesheet" href="../styles/slide.css">
+    <link rel="stylesheet" href="../styles/corpo.css">
+    <link rel="stylesheet" href="../styles/footer.css">
+    <link rel="stylesheet" href="../styles/modal.css">
+</head>
+<body>
+
+    <!--Cabeçalho do sistema-->
+
+    <header class="cabecalho">
+
+        <div class="logo">
+            <h1>Banco Atlântico</h1>
+        </div>
+
+        <div class="links">
+            <nav>
+                <ul>
+                    <li id="Cada">Cadastre-se</li>
+                    <li id="login">Entrar</li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="acerca">
+            <img src="../pictures/help.png" alt="Icone de Ajuda" title="Acerca">
+        </div>
+    </header>
+
+    <!-- Corpo Do Sistema -->
+
+    <main class="corpo">
+
+        <!-- S L I D E -->
+        <div class="content">
+
+        <div class="slides">
+
+        <input type="radio" name="slide" id="slide1" class="slidenput" checked>
+        <input type="radio" name="slide" id="slide2" class="slidenput">
+        <input type="radio" name="slide" id="slide3" class="slidenput">
+        <input type="radio" name="slide" id="slide4" class="slidenput">
+
+        <div class="slide s1">
+            <img src="../pictures/banner_1.png" alt="">
+        </div>
+
+        <div class="slide">
+            <img src="../pictures/banner_2.png" alt="">
+        </div>
+
+        <div class="slide">
+            <img src="../pictures/atlantico.png" alt="">
+        </div>
+
+        <div class="slide">
+            <img src="../pictures/acessoatlantico-directo_2.png" alt="">
+        </div>
+
+        </div>
+
+        <div class="navegacao">
+        <label for="slide1" class="borda"></label>
+        <label for="slide2" class="borda"></label>
+        <label for="slide3" class="borda"></label>
+        <label for="slide4" class="borda"></label>
+    </div>
+
+    </div>
+
+    <br>
+    <br>
+        <!--APRESENTAÇÃO-->
+
+        <div class="apresentacao">
+
+            <div class="fundo">
+
+
+                <div class="apresentacao-conteudo">
+
+                    <h2>BANCO MILLENNIUM ATLÂNTICO </h2>
+
+                    <br>
+
+                    <h3>Bem-vindo ao banco millennium, o seu local de investimento</h3>
+
+                    <br>
+                    <br>
+                    <br>
+
+
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate quia tempore 
+                        qui inventore eaque in odio distinctio enim provident error debitis mollitia,
+                        rem laudantium molestiae temporibus optio nobis saepe voluptatibus.
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia dolorem, 
+                        maxime natus eveniet ipsum consequatur nisi,
+                        ducimus vel laudantium aut blanditiis alias nobis tenetur! Quis omnis laboriosam praesentium hic velit.
+                    </p>
+                    <br>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate quia tempore 
+                        qui inventore eaque in odio distinctio enim provident error debitis mollitia,
+                        rem laudantium molestiae temporibus optio nobis saepe voluptatibus.
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia dolorem, 
+                        maxime natus eveniet ipsum consequatur nisi,
+                        ducimus vel laudantium aut blanditiis alias nobis tenetur! Quis omnis laboriosam praesentium hic velit.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <!--M O D A L-->
+
+        <div class="cadastro" id="modalCadastro">
+
+         
+
+
+            <div class="info">
+                <div class="sairCadastro" id="sairCadastro">X</div>
+                <p class="erro" id="erro"></p>
+                <br>
+                <h2>cadastro</h2>
+                <br>
+                <form action="index.php" method="post" onsubmit="return validacao()">
+                    <input type="text" name="nome" id="nome" placeholder="Nome Cliente: Filipe João Mateus">
+                    <input type="email" name="email" id="email" placeholder="E-mail: filipe@gmail.com" >
+                    <input type="text" maxlength="9" name="telefone" id="telefone" placeholder="Tel: 923501687">
+                    <input type="password" name="senha" id="senha" placeholder="Senha: somente números" >
+                    <input type="submit" value="Cadastrar" class="btnCadastro">
+                </form>
+            </div>
+        </div>
+
+        <div class="regisModal" id="regisModal">
+
+            <div class="infoRegister">
+                <div class="sairRegister" id="sairRegister">X</div>
+                <br>
+                <h2>Login</h2>
+                <br>
+                <form action="test.php" method="post">
+                    
+                    <input type="email" name="email" id="email" placeholder="E-mail" required>
+                    <input type="password" name="senha" id="senha" placeholder="Senha" required>
+                    <input type="submit" value="Entrar" class="btnLogin">
+                </form>
+            </div>
+        </div>
+    </main>
+
+
+
+
+    <footer>
+
+        
+        <br>
+        <div class="acerca-system">
+
+
+            <div class="sobre">
+
+                <h6>Sobre</h6>
+                <br>
+                <nav>
+                    <ul>
+                        <li><a href="#">Sobre o systema</a></li>
+                        <li><a href="#">Configurações</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="sobre">
+
+                <h6>História</h6>
+                <br>
+                <nav>
+                    <ul>
+                        <li><a href="#">Sobre o systema</a></li>
+                        <li><a href="#">Configurações</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="sobre">
+
+                <h6>Ajuda Tecnica</h6>
+                <br>
+                <nav>
+                    <ul>
+                        <li><a href="#">Sobre o systema</a></li>
+                        <li><a href="#">Configurações</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="newslatter">
+            <h4>newslatter</h4>
+            <br>
+
+            <form action="index.php" method="post">
+                <input class="outro" type="text" name="telefone" id="telefone" placeholder="Tel: 923501687" required>
+                <input type="email" name="email" id="email" placeholder="E-mail: filipe@gmail.com" required>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+
+    </footer>
+
+
+    <!--Arquivos JavaScript-->
+    <script src="../js/slide.js"></script>
+    <script src="../js/modal.js"></script>
+    <script src="../js/validacao.js"></script>
+</body>
+</html>
